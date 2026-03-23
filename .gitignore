@@ -1,0 +1,8 @@
+# dir
+dev/
+tests/
+
+**/node_modules
+**/package-lock.json
+
+# files

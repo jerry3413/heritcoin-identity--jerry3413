@@ -1,0 +1,17 @@
+{
+  "skill_name": "heritcoin-recognizer",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "帮我识别这两张硬币图片：\nhttps://cdn.heritcoin.com/sky/identify/original/image/20260313/i260313194301465irk1ikkrd0cqsba9-W720H1280.jpeg\nhttps://cdn.heritcoin.com/sky/identify/original/image/20260313/i2603131943005mmdobe4kgt203nopcp-W720H1280.jpg",
+      "expected_output": "返回硬币识别结果，包含国家、面值、年份、估价等信息",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "鉴定一下这枚硬币：\nhttps://cdn.heritcoin.com/sky/identify/original/image/20260313/i260313194255ajydm5u2b34llvzgp1l-W720H1280.jpeg\nhttps://cdn.heritcoin.com/sky/identify/original/image/20260313/i260313194255kxg94sme3b215ctr3xx-W720H1280.jpeg",
+      "expected_output": "返回硬币识别结果，包含国家、面值、年份、估价等信息",
+      "files": []
+    }
+  ]
+}

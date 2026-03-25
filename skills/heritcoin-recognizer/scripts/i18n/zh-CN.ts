@@ -3,6 +3,8 @@ import type { LocaleContent } from "./en.ts";
 export const zhCN: LocaleContent = {
   labels: {
     valuation: "估价",
+    item: "项目",
+    value: "详情",
     name: "名称",
     year: "年份",
     region: "国家/地区",

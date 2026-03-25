@@ -3,6 +3,8 @@ import type { LocaleContent } from "./en.ts";
 export const ja: LocaleContent = {
   labels: {
     valuation: "估值",
+    item: "項目",
+    value: "詳細",
     name: "名称",
     year: "年",
     region: "国/地域",

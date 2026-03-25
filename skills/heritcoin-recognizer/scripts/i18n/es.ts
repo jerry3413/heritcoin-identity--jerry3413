@@ -3,6 +3,8 @@ import type { LocaleContent } from "./en.ts";
 export const es: LocaleContent = {
   labels: {
     valuation: "Valoración",
+    item: "Elemento",
+    value: "Detalles",
     name: "Nombre",
     year: "Año",
     region: "País/Región",

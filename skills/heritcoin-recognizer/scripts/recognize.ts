@@ -23,7 +23,7 @@ import {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const API_URL = "https://api.heritcoin.com/app/v1/inference-machine";
+const API_URL = "https://api.heritcoin.com/app/v1/inference-machine-skills";
 const UPLOAD_URL = "https://api.heritcoin.com/app/v1/file/file-upload-skills";
 
 const DEFAULT_TOKEN =
@@ -85,7 +85,11 @@ function findLatestSessionFile(rootDir: string): string | null {
         continue;
       }
 
-      if (!entry.isFile() || !entry.name.startsWith("rollout-") || !entry.name.endsWith(".jsonl")) {
+      if (
+        !entry.isFile() ||
+        !entry.name.startsWith("rollout-") ||
+        !entry.name.endsWith(".jsonl")
+      ) {
         continue;
       }
 
@@ -106,7 +110,10 @@ function findLatestSessionFile(rootDir: string): string | null {
   return matches[0].path;
 }
 
-function findSessionFileByThreadId(rootDir: string, threadId: string): string | null {
+function findSessionFileByThreadId(
+  rootDir: string,
+  threadId: string,
+): string | null {
   function walk(directory: string): string | null {
     for (const entry of readdirSync(directory, { withFileTypes: true })) {
       const fullPath = join(directory, entry.name);
@@ -170,7 +177,9 @@ function extractUserText(entry: unknown): string | null {
   }
 
   const text = record.payload.content
-    .filter((item) => item.type === "input_text" && typeof item.text === "string")
+    .filter(
+      (item) => item.type === "input_text" && typeof item.text === "string",
+    )
     .map((item) => String(item.text))
     .join(" ")
     .trim();
@@ -195,7 +204,9 @@ export function detectConversationLocaleFromSessionFile(
         continue;
       }
 
-      const detectedLocale = detectLocaleFromText(stripImageRefsFromText(userText));
+      const detectedLocale = detectLocaleFromText(
+        stripImageRefsFromText(userText),
+      );
       if (detectedLocale) {
         return detectedLocale;
       }
@@ -213,7 +224,8 @@ function detectConversationLocale(): SupportedLocale | null {
     const threadSessionFile = process.env.CODEX_THREAD_ID
       ? findSessionFileByThreadId(sessionsRoot, process.env.CODEX_THREAD_ID)
       : null;
-    const sessionFile = threadSessionFile || findLatestSessionFile(sessionsRoot);
+    const sessionFile =
+      threadSessionFile || findLatestSessionFile(sessionsRoot);
 
     if (!sessionFile) {
       return null;
@@ -225,7 +237,9 @@ function detectConversationLocale(): SupportedLocale | null {
   }
 }
 
-export function resolveRuntimeLocale(locale?: SupportedLocale | string): SupportedLocale {
+export function resolveRuntimeLocale(
+  locale?: SupportedLocale | string,
+): SupportedLocale {
   const explicitLocale = locale
     ? typeof locale === "string"
       ? normalizeLocale(locale)
@@ -431,7 +445,10 @@ function isDataUrl(value: string): boolean {
   return /^data:image\/[a-zA-Z0-9.+-]+;base64,/.test(value);
 }
 
-function parseDataUrl(dataUrl: string): { mimeType: string; base64Content: string } {
+function parseDataUrl(dataUrl: string): {
+  mimeType: string;
+  base64Content: string;
+} {
   const match = dataUrl.match(
     /^data:(image\/[a-zA-Z0-9.+-]+);base64,([A-Za-z0-9+/=\s]+)$/,
   );
@@ -444,7 +461,9 @@ function parseDataUrl(dataUrl: string): { mimeType: string; base64Content: strin
   };
 }
 
-function createUploadHeaders(locale?: SupportedLocale): Record<string, string | number> {
+function createUploadHeaders(
+  locale?: SupportedLocale,
+): Record<string, string | number> {
   return {
     "User-Agent": generateUserAgent(locale),
     Host: "identify-api-t.wpt.la",
@@ -591,7 +610,9 @@ async function recognizeCoin(
   return (await response.json()) as CoinRecognitionResponse;
 }
 
-function buildPropertyMap(entries?: PropertyValueEntry[]): Record<string, string> {
+function buildPropertyMap(
+  entries?: PropertyValueEntry[],
+): Record<string, string> {
   const result: Record<string, string> = {};
 
   for (const entry of entries || []) {

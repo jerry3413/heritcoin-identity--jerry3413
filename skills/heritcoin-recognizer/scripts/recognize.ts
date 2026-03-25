@@ -358,6 +358,31 @@ function buildCollectionAdvice(
   return `${t.labels.collectionAdvice}: ${advice}`;
 }
 
+function escapeMarkdownTableCell(value: string): string {
+  return value
+    .replace(/\r?\n/g, "<br>")
+    .replace(/\|/g, "\\|")
+    .trim();
+}
+
+function buildMarkdownTable(
+  rows: Array<{ label: string; value: string }>,
+  locale?: SupportedLocale,
+): string {
+  const t = getLocale(locale);
+  const header = `| ${t.labels.item} | ${t.labels.value} |
+| --- | --- |`;
+
+  const body = rows
+    .map(
+      ({ label, value }) =>
+        `| ${escapeMarkdownTableCell(label)} | ${escapeMarkdownTableCell(value)} |`,
+    )
+    .join("\n");
+
+  return body ? `${header}\n${body}` : "";
+}
+
 interface CoinRecognitionResponse {
   code: number;
   msg?: string;
@@ -728,55 +753,58 @@ function parseCoinInfo(
 
 function formatOutput(info: CoinInfo, locale?: SupportedLocale): string {
   const t = getLocale(locale);
-  const parts: string[] = [];
+  const rows: Array<{ label: string; value: string }> = [];
 
   if (info.recognitionText) {
-    parts.push(`${t.labels.name}: ${info.recognitionText}`);
+    rows.push({ label: t.labels.name, value: info.recognitionText });
   }
   if (info.price && info.priceUnit) {
-    parts.push(`${t.labels.valuation}: ${info.price} ${info.priceUnit}`);
+    rows.push({
+      label: t.labels.valuation,
+      value: `${info.price} ${info.priceUnit}`,
+    });
   }
   if (info.years) {
-    parts.push(`${t.labels.year}: ${info.years}`);
+    rows.push({ label: t.labels.year, value: info.years });
   }
   if (info.region) {
-    parts.push(`${t.labels.region}: ${info.region}`);
+    rows.push({ label: t.labels.region, value: info.region });
   }
   if (info.denomination) {
-    parts.push(`${t.labels.denomination}: ${info.denomination}`);
+    rows.push({ label: t.labels.denomination, value: info.denomination });
   }
   if (info.mintage) {
-    parts.push(`${t.labels.mintage}: ${info.mintage}`);
+    rows.push({ label: t.labels.mintage, value: info.mintage });
   }
 
-  const details: string[] = [];
   if (info.krauseNumber) {
-    details.push(`${t.labels.krauseNumber}: ${info.krauseNumber}`);
+    rows.push({ label: t.labels.krauseNumber, value: info.krauseNumber });
   }
   if (info.metal) {
-    details.push(`${t.labels.material}: ${info.metal}`);
+    rows.push({ label: t.labels.material, value: info.metal });
   }
-  if (info.diameter || info.thickness || info.weight) {
-    if (info.diameter) details.push(`${t.labels.diameter}: ${info.diameter}`);
-    if (info.thickness)
-      details.push(`${t.labels.thickness}: ${info.thickness}`);
-    if (info.weight) details.push(`${t.labels.weight}: ${info.weight}`);
+  if (info.diameter) {
+    rows.push({ label: t.labels.diameter, value: info.diameter });
+  }
+  if (info.thickness) {
+    rows.push({ label: t.labels.thickness, value: info.thickness });
+  }
+  if (info.weight) {
+    rows.push({ label: t.labels.weight, value: info.weight });
   }
   if (info.frontDesc) {
-    details.push(`${t.labels.obverse}: ${info.frontDesc}`);
+    rows.push({ label: t.labels.obverse, value: info.frontDesc });
   }
   if (info.backDesc) {
-    details.push(`${t.labels.reverse}: ${info.backDesc}`);
+    rows.push({ label: t.labels.reverse, value: info.backDesc });
   }
 
-  const mainInfo = parts.length > 0 ? parts.join("\n") : "";
-  const detailInfo =
-    details.length > 0 ? `${t.labels.details}\n\n${details.join("\n")}` : "";
+  const table = buildMarkdownTable(rows, locale);
   const collectionAdvice = buildCollectionAdvice(info, locale);
 
-  return `${t.messages.recognitionResult}
+  return `## ${t.messages.recognitionResult}
 
-${mainInfo}${mainInfo && detailInfo ? "\n\n" : ""}${detailInfo}${(mainInfo || detailInfo) && collectionAdvice ? "\n\n" : ""}${collectionAdvice}`;
+${table}${table && collectionAdvice ? "\n\n" : ""}${collectionAdvice}`;
 }
 
 export async function main(

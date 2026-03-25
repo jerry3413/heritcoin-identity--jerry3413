@@ -36,7 +36,7 @@ node recognize.ts <img1> <img2> [token] [locale]
 - `coinInformation` / `propertyList` 当前是 `{ property, value }[]` 结构；字段映射必须按 `property` 取值，不能再按旧对象结构读取。
 - `obverseReverseInfo.frontInfo.detail` / `backInfo.detail` 当前可能是数组；脚本需要保留其中的 `Description`、`Creators` 等非空字段，不要只输出 `labels`。
 - `recognize.ts` 负责把“名称/估价”排在前面，并在结尾追加 1 行简短收藏建议；收藏建议应引用当前币种或估价信息，不应始终是固定同一句。
-- 最终答复默认必须保持普通纯文本；不要在 agent 层改成 Markdown 表格、管道对齐文本或代码块，否则 WhatsApp 等聊天渠道会出现异常渲染。
+- 最终答复默认输出为 Markdown 标题加两列表格；不要在 agent 层改回普通纯文本，也不要用代码块包裹表格。
 - `recognize.ts` 的 locale 解析顺序是：显式传入的 `locale` -> 当前会话里最近一条有实际文字内容的用户消息语言 -> 系统 locale。
 - `recognize.ts` 生成请求头时也会使用最终 locale 的语言和地区编码，不再只看系统环境。
 - agent 在脚本成功时应直接返回脚本最终文本，不要为了“更简洁”而二次摘要或丢字段。

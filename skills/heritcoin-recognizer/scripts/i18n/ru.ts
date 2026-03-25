@@ -3,6 +3,8 @@ import type { LocaleContent } from "./en.ts";
 export const ru: LocaleContent = {
   labels: {
     valuation: "Оценка",
+    item: "Пункт",
+    value: "Детали",
     name: "Название",
     year: "Год",
     region: "Страна/Регион",

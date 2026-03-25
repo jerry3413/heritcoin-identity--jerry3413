@@ -1,6 +1,8 @@
 export const en = {
   labels: {
     valuation: "Valuation",
+    item: "Item",
+    value: "Details",
     name: "Name",
     year: "Year",
     region: "Country/Region",

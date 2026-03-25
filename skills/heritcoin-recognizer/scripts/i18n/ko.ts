@@ -3,6 +3,8 @@ import type { LocaleContent } from "./en.ts";
 export const ko: LocaleContent = {
   labels: {
     valuation: "평가",
+    item: "항목",
+    value: "상세",
     name: "이름",
     year: "연도",
     region: "국가/지역",

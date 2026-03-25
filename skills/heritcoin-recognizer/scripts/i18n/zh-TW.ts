@@ -17,6 +17,9 @@ export const zhTW: LocaleContent = {
     reverse: "背面",
     details: "詳細資訊",
     collectionAdvice: "收藏建議",
+    lettering: "銘文",
+    description: "描述",
+    creators: "設計者",
   },
   messages: {
     recognitionResult: "識別結果",
@@ -25,7 +28,9 @@ export const zhTW: LocaleContent = {
     recognitionFailed: "識別失敗",
     notCoin: "未識別為硬幣，可能是其他物品",
     error: "錯誤",
-    collectionAdviceWithValuation: "先把目前估價當作快速參考，優先保護品相，再決定是否長期收藏。",
+    collectionAdviceWithValuation: "目前估價約 {valuation}，優先保護原貌；如果要進一步細分價值，建議再核對鑄記、版別與品相細節。",
+    collectionAdviceForCoinWithValuation: "這枚 {coin} 目前估價約 {valuation}，優先保護原貌；如果要進一步細分價值，建議再核對鑄記、版別與品相細節。",
+    collectionAdviceForCoin: "這枚 {coin} 建議先保護原貌，再結合鑄記、版別與品相細節判斷收藏價值。",
     collectionAdviceDefault: "建議先保護品相，再結合版別和鑄記判斷是否長期收藏。",
   },
   prompts: {

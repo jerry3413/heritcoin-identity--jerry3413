@@ -17,6 +17,9 @@ export const ja: LocaleContent = {
     reverse: "裹面",
     details: "詳細情報",
     collectionAdvice: "収蔵アドバイス",
+    lettering: "銘文",
+    description: "説明",
+    creators: "デザイナー",
   },
   messages: {
     recognitionResult: "認識結果",
@@ -25,7 +28,9 @@ export const ja: LocaleContent = {
     recognitionFailed: "認識失敗",
     notCoin: "硬貨として認識できませんでした。他の物の可能性があります",
     error: "エラー",
-    collectionAdviceWithValuation: "まずは現在の推定価格を目安にしつつ、長期保有を判断する前に品相の保護を優先してください。",
+    collectionAdviceWithValuation: "現在の推定価格はおよそ{valuation}です。まず状態保護を優先し、その後にミントマーク、版別、品相の詳細を確認すると査定を詰めやすくなります。",
+    collectionAdviceForCoinWithValuation: "{coin} の現在の推定価格はおよそ{valuation}です。まず状態保護を優先し、その後にミントマーク、版別、品相の詳細を確認すると査定を詰めやすくなります。",
+    collectionAdviceForCoin: "{coin} はまず状態保護を優先し、その後にミントマーク、版別、品相の詳細を確認してから長期保有を判断してください。",
     collectionAdviceDefault: "まず品相の保護を優先し、長期保有を決める前に版別やミントマークを確認してください。",
   },
   prompts: {

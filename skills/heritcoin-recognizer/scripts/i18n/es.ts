@@ -17,6 +17,9 @@ export const es: LocaleContent = {
     reverse: "Reverso",
     details: "Detalles",
     collectionAdvice: "Consejo de Colección",
+    lettering: "Leyenda",
+    description: "Descripción",
+    creators: "Diseñadores",
   },
   messages: {
     recognitionResult: "Resultado del Reconocimiento",
@@ -25,7 +28,9 @@ export const es: LocaleContent = {
     recognitionFailed: "Reconocimiento fallido",
     notCoin: "No reconocido como moneda, puede ser otro objeto",
     error: "Error",
-    collectionAdviceWithValuation: "Usa la valoración actual como referencia rápida y prioriza preservar el estado de la moneda antes de decidir si la conservarás a largo plazo.",
+    collectionAdviceWithValuation: "La valoración actual es de aproximadamente {valuation}; prioriza preservar el estado de la moneda y luego verifica la marca de ceca, la variante y los detalles de conservación para afinar la tasación.",
+    collectionAdviceForCoinWithValuation: "Para {coin}, la valoración actual es de aproximadamente {valuation}; prioriza preservar el estado de la moneda y luego verifica la marca de ceca, la variante y los detalles de conservación para afinar la tasación.",
+    collectionAdviceForCoin: "Para {coin}, preserva primero el estado de la moneda y luego verifica la marca de ceca, la variante y los detalles de conservación antes de decidir una colección a largo plazo.",
     collectionAdviceDefault: "Prioriza preservar primero el estado de la moneda y luego revisa la variante y la marca de ceca antes de decidir una colección a largo plazo.",
   },
   prompts: {

@@ -17,6 +17,9 @@ export const zhCN: LocaleContent = {
     reverse: "背面",
     details: "详细信息",
     collectionAdvice: "收藏建议",
+    lettering: "铭文",
+    description: "描述",
+    creators: "设计者",
   },
   messages: {
     recognitionResult: "识别结果",
@@ -25,8 +28,10 @@ export const zhCN: LocaleContent = {
     recognitionFailed: "识别失败",
     notCoin: "未识别为硬币，可能是其他物品",
     error: "错误",
-    collectionAdviceWithValuation: "先把当前估价当作快速参考，优先保护品相，再决定是否长期收藏。",
-    collectionAdviceDefault: "建议先保护品相，再结合版别和铸记判断是否长期收藏。",
+    collectionAdviceWithValuation: "当前估价约 {valuation}，建议先保持原始状态。",
+    collectionAdviceForCoinWithValuation: "这枚 {coin} 当前估价约 {valuation}，建议先保持原始状态。",
+    collectionAdviceForCoin: "这枚 {coin} 建议先保持原始状态。",
+    collectionAdviceDefault: "建议先保持原始状态。",
   },
   prompts: {
     usage: "用法: node recognize.ts <img1> <img2> [token] [locale]",

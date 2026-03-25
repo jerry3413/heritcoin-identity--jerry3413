@@ -7,7 +7,7 @@ import {
   writeFileSync,
 } from "fs";
 import { homedir } from "os";
-import { extname, join, dirname } from "path";
+import { join, dirname } from "path";
 import { execSync } from "child_process";
 import { fileURLToPath } from "url";
 import {
@@ -259,15 +259,87 @@ interface CoinInfo {
   backDesc: string;
 }
 
+interface PropertyValueEntry {
+  property?: string;
+  value?: string | number | boolean | null;
+}
+
+interface SideDetailEntry {
+  property?: string;
+  value?: string | number | boolean | null;
+}
+
+interface SideInfo {
+  labels?: string[];
+  tags?: string[];
+  detail?: SideDetailEntry[] | string;
+}
+
+function stringifyValue(value: unknown): string {
+  if (typeof value === "string") {
+    return value.trim();
+  }
+  if (typeof value === "number" || typeof value === "boolean") {
+    return String(value);
+  }
+  return "";
+}
+
+function uniqueNonEmpty(values: Array<string | undefined>): string[] {
+  const result: string[] = [];
+  const seen = new Set<string>();
+
+  for (const value of values) {
+    const normalized = stringifyValue(value);
+    if (!normalized || seen.has(normalized)) {
+      continue;
+    }
+    seen.add(normalized);
+    result.push(normalized);
+  }
+
+  return result;
+}
+
+function formatTemplate(
+  template: string,
+  values: Record<string, string>,
+): string {
+  return template.replace(/\{(\w+)\}/g, (_, key: string) => values[key] || "");
+}
+
+function buildCoinSubject(info: CoinInfo): string {
+  if (info.recognitionText) {
+    return info.recognitionText;
+  }
+
+  return uniqueNonEmpty([info.years, info.region, info.denomination]).join(" ");
+}
+
 function buildCollectionAdvice(
   info: CoinInfo,
   locale?: SupportedLocale,
 ): string {
   const t = getLocale(locale);
-  const advice =
-    info.price && info.priceUnit
-      ? t.messages.collectionAdviceWithValuation
-      : t.messages.collectionAdviceDefault;
+  const subject = buildCoinSubject(info);
+  const valuation = uniqueNonEmpty([info.price, info.priceUnit]).join(" ");
+
+  let advice = t.messages.collectionAdviceDefault;
+
+  if (subject && valuation) {
+    advice = formatTemplate(t.messages.collectionAdviceForCoinWithValuation, {
+      coin: subject,
+      valuation,
+    });
+  } else if (subject) {
+    advice = formatTemplate(t.messages.collectionAdviceForCoin, {
+      coin: subject,
+    });
+  } else if (valuation) {
+    advice = formatTemplate(t.messages.collectionAdviceWithValuation, {
+      valuation,
+    });
+  }
 
   return `${t.labels.collectionAdvice}: ${advice}`;
 }
@@ -277,16 +349,11 @@ interface CoinRecognitionResponse {
   msg?: string;
   data?: {
     recognitionText: string;
-    coinInformation?: Array<{
-      Region?: string;
-      Denomination?: string;
-      "Krause number"?: string;
-      Mintage?: string;
-      Metal?: string;
-    }>;
+    coinInformation?: PropertyValueEntry[];
+    propertyList?: PropertyValueEntry[];
     obverseReverseInfo?: {
-      frontInfo?: { labels?: string[]; tags?: string[]; detail?: string };
-      backInfo?: { labels?: string[]; tags?: string[]; detail?: string };
+      frontInfo?: SideInfo;
+      backInfo?: SideInfo;
     };
     physicalFeaturesInfo?: {
       thickness?: string;
@@ -295,7 +362,7 @@ interface CoinRecognitionResponse {
     };
     price?: string;
     priceUnit?: string;
-    years?: string;
+    years?: string | number;
     isCoin?: number;
   };
 }
@@ -354,18 +421,6 @@ function generateUserAgent(locale?: SupportedLocale): string {
   ];
 
   return parts.join(";");
-}
-
-function getMimeType(filePath: string): string {
-  const ext = extname(filePath).toLowerCase();
-  const mimeTypes: Record<string, string> = {
-    ".jpg": "image/jpeg",
-    ".jpeg": "image/jpeg",
-    ".png": "image/png",
-    ".gif": "image/gif",
-    ".webp": "image/webp",
-  };
-  return mimeTypes[ext] || "image/jpeg";
 }
 
 function isHttpUrl(value: string): boolean {
@@ -536,18 +591,100 @@ async function recognizeCoin(
   return (await response.json()) as CoinRecognitionResponse;
 }
 
-function parseCoinInfo(response: CoinRecognitionResponse): CoinInfo {
+function buildPropertyMap(entries?: PropertyValueEntry[]): Record<string, string> {
+  const result: Record<string, string> = {};
+
+  for (const entry of entries || []) {
+    const property = stringifyValue(entry.property);
+    const value = stringifyValue(entry.value);
+
+    if (!property || !value || result[property]) {
+      continue;
+    }
+
+    result[property] = value;
+  }
+
+  return result;
+}
+
+function translateSideDetailProperty(
+  property: string,
+  locale?: SupportedLocale,
+): string {
+  const t = getLocale(locale);
+  const normalized = property.trim().toLowerCase();
+
+  if (normalized === "description") {
+    return t.labels.description;
+  }
+  if (normalized === "creators" || normalized === "creator") {
+    return t.labels.creators;
+  }
+
+  return property;
+}
+
+function formatSideDescription(
+  sideInfo: SideInfo | undefined,
+  locale?: SupportedLocale,
+): string {
+  if (!sideInfo) {
+    return "";
+  }
+
+  const t = getLocale(locale);
+  const detailEntries = Array.isArray(sideInfo.detail) ? sideInfo.detail : [];
+  const descriptionEntries = detailEntries.filter(
+    (entry) => stringifyValue(entry.property).toLowerCase() === "description",
+  );
+  const otherEntries = detailEntries.filter(
+    (entry) => stringifyValue(entry.property).toLowerCase() !== "description",
+  );
+
+  return uniqueNonEmpty([
+    ...descriptionEntries.map((entry) => {
+      const value = stringifyValue(entry.value);
+      return value ? `${t.labels.description}: ${value}` : "";
+    }),
+    ...uniqueNonEmpty(sideInfo.labels || []),
+    sideInfo.tags?.length
+      ? `${t.labels.lettering}: ${uniqueNonEmpty(sideInfo.tags).join("、")}`
+      : "",
+    ...otherEntries.map((entry) => {
+      const property = stringifyValue(entry.property);
+      const value = stringifyValue(entry.value);
+
+      if (!value) {
+        return "";
+      }
+      if (!property) {
+        return value;
+      }
+
+      return `${translateSideDetailProperty(property, locale)}: ${value}`;
+    }),
+    typeof sideInfo.detail === "string" ? sideInfo.detail : "",
+  ]).join("；");
+}
+
+function parseCoinInfo(
+  response: CoinRecognitionResponse,
+  locale?: SupportedLocale,
+): CoinInfo {
   const data = response.data;
   if (!data) throw new Error("响应数据为空");
 
-  const coinInfo = data.coinInformation?.[0] || {};
+  const coinInfo = buildPropertyMap(
+    data.coinInformation?.length ? data.coinInformation : data.propertyList,
+  );
   const physical = data.physicalFeaturesInfo || {};
   const front = data.obverseReverseInfo?.frontInfo || {};
   const back = data.obverseReverseInfo?.backInfo || {};
 
   return {
     recognitionText: data.recognitionText || "",
-    years: data.years || "",
+    years: stringifyValue(data.years),
     region: coinInfo.Region || "",
     denomination: coinInfo.Denomination || "",
     mintage: coinInfo.Mintage || "",
@@ -558,10 +695,8 @@ function parseCoinInfo(response: CoinRecognitionResponse): CoinInfo {
     diameter: physical.diameter || "",
     thickness: physical.thickness || "",
     weight: physical.weight || "",
-    frontDesc:
-      front.labels?.join("、") || front.tags?.join("、") || front.detail || "",
-    backDesc:
-      back.labels?.join("、") || back.tags?.join("、") || back.detail || "",
+    frontDesc: formatSideDescription(front, locale),
+    backDesc: formatSideDescription(back, locale),
   };
 }
 
@@ -638,7 +773,7 @@ export async function main(
       return t.messages.notCoin;
     }
 
-    const info = parseCoinInfo(response);
+    const info = parseCoinInfo(response, runtimeLocale);
     return formatOutput(info, runtimeLocale);
   } catch (error) {
     return `${t.messages.error}: ${error instanceof Error ? error.message : String(error)}`;

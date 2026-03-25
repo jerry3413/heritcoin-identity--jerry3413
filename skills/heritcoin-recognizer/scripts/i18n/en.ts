@@ -15,6 +15,9 @@ export const en = {
     reverse: "Reverse",
     details: "Details",
     collectionAdvice: "Collection Advice",
+    lettering: "Lettering",
+    description: "Description",
+    creators: "Creators",
   },
   messages: {
     recognitionResult: "Recognition Result",
@@ -23,7 +26,9 @@ export const en = {
     recognitionFailed: "Recognition failed",
     notCoin: "Not recognized as a coin, may be other object",
     error: "Error",
-    collectionAdviceWithValuation: "Use the current valuation as a quick reference, and prioritize preserving the coin's condition before making any long-term collecting decision.",
+    collectionAdviceWithValuation: "The current valuation is about {valuation}; prioritize preserving the coin's condition, then verify the mint mark, variety, and condition details for a tighter appraisal.",
+    collectionAdviceForCoinWithValuation: "For {coin}, the current valuation is about {valuation}; prioritize preserving the coin's condition, then verify the mint mark, variety, and condition details for a tighter appraisal.",
+    collectionAdviceForCoin: "For {coin}, preserve the coin's condition first, then verify the mint mark, variety, and condition details before deciding on long-term collecting.",
     collectionAdviceDefault: "Prioritize preserving the coin's condition first, then review the variety and mint mark before deciding on long-term collecting.",
   },
   prompts: {

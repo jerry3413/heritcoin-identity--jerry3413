@@ -5,6 +5,7 @@
 ## 入口
 
 - 主脚本：[scripts/recognize.ts](../scripts/recognize.ts)
+- 桥接脚本：[scripts/resolve-image-inputs.ts](../scripts/resolve-image-inputs.ts)
 - CLI：
 
 ```bash
@@ -18,13 +19,17 @@ npx tsx recognize.ts <img1> <img2> [--token <token>] [--locale <locale>]
   - `http` 或 `https` URL
   - 本地图片路径
   - `data:image/...;base64,...` 数据 URL
-- 脚本不再读取聊天会话、session 日志或线程状态。
-- 宿主如果支持聊天附件，必须先把附件转成 URL、本地路径或 data URL，再调用主脚本。
+- `recognize.ts` 不读取聊天会话、session 日志或线程状态。
+- 聊天附件和跨消息补图恢复由桥接脚本负责，不属于 `recognize.ts` 的职责。
+- 桥接脚本必须绑定当前线程上下文；如果缺少上下文，应直接失败，不能回退到“最新 session”。
 
 ## 当前脚本行为
 
 - 两个参数都是 URL 时，直接调用识别接口。
 - 任一参数是本地路径或数据 URL 时，先上传图片，再调用识别接口。
+- `resolve-image-inputs.ts` 会从当前宿主线程恢复最近一个仍未完成任务的图片集合。
+- `resolve-image-inputs.ts` 会同时处理聊天附件、显式图片 URL、显式本地路径，以及“还差一张图”后的补图消息。
+- `resolve-image-inputs.ts` 只输出当前任务的 `images` 数组，不调用识别服务，也不决定 locale。
 - `recognize.ts` 负责把接口中的材质、直径、厚度、重量、正反面描述等非空字段格式化进最终文本。
 - `coinInformation` / `propertyList` 当前是 `{ property, value }[]` 结构；字段映射必须按 `property` 取值，不能再按旧对象结构读取。
 - `obverseReverseInfo.frontInfo.detail` / `backInfo.detail` 当前可能是数组；脚本需要保留其中的 `Description`、`Creators` 等非空字段，不要只输出 `labels`。
@@ -42,6 +47,7 @@ npx tsx recognize.ts <img1> <img2> [--token <token>] [--locale <locale>]
 ## 变更规则
 
 - 修改接口调用、认证方式或字段映射时，同时更新：
+  - [scripts/resolve-image-inputs.ts](../scripts/resolve-image-inputs.ts)
   - [scripts/recognize.ts](../scripts/recognize.ts)
   - [evals/evals.json](../evals/evals.json)
   - 本文件

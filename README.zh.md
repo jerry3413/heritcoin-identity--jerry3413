@@ -9,7 +9,7 @@ AI 驱动的硬币和古董鉴定技能。
 - 🪙 **硬币识别** - 识别古钱币、纪念币、机制币，获取详细的鉴定信息
 - 💰 **实时估价** - 提供硬币的市场估值参考
 - 🔍 **多语言支持** - 支持中文、英文、日语、韩语、俄语、西班牙语等多语言识别
-- 📱 **便捷交互** - 支持图片 URL、本地文件路径和 data URL 输入
+- 📱 **便捷交互** - 支持聊天附件、图片 URL、本地文件路径和 data URL 输入
 
 ## 快速开始
 
@@ -51,7 +51,10 @@ npx skills add heritcoin/heritcoin-identity --skill heritcoin-recognizer
 # 方式二：提供本地图片路径
 /heritcoin-recognizer /path/to/obverse.jpg /path/to/reverse.jpg
 
-# 方式三：调用脚本
+# 方式三：直接上传图片让宿主桥接后识别
+/heritcoin-recognizer
+
+# 方式四：调用脚本
 npx tsx skills/heritcoin-recognizer/scripts/recognize.ts <img1> <img2> --locale zh-CN
 ```
 

@@ -36,7 +36,7 @@ export const zhCN: LocaleContent = {
     collectionAdviceDefault: "建议先保持原始状态。",
   },
   prompts: {
-    usage: "用法: node recognize.ts <img1> <img2> [token] [locale]",
+    usage: "用法: npx tsx recognize.ts <img1> <img2> [token] [locale]",
     missingFiles: "请提供两个图片文件",
   },
 };

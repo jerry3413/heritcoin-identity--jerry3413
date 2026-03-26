@@ -36,7 +36,7 @@ export const ru: LocaleContent = {
     collectionAdviceDefault: "Сначала сохраните состояние монеты, а затем проверьте разновидность и знак монетного двора перед решением о долгосрочном хранении в коллекции.",
   },
   prompts: {
-    usage: "Использование: node recognize.ts <img1> <img2> [token] [locale]",
+    usage: "Использование: npx tsx recognize.ts <img1> <img2> [token] [locale]",
     missingFiles: "Пожалуйста, укажите оба файла изображений",
   },
 };

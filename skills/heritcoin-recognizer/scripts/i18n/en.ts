@@ -34,7 +34,7 @@ export const en = {
     collectionAdviceDefault: "Prioritize preserving the coin's condition first, then review the variety and mint mark before deciding on long-term collecting.",
   },
   prompts: {
-    usage: "Usage: node recognize.ts <img1> <img2> [token] [locale]",
+    usage: "Usage: npx tsx recognize.ts <img1> <img2> [token] [locale]",
     missingFiles: "Please provide both image files",
   },
 };

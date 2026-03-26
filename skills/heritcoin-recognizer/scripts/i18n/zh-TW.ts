@@ -36,7 +36,7 @@ export const zhTW: LocaleContent = {
     collectionAdviceDefault: "建議先保護品相，再結合版別和鑄記判斷是否長期收藏。",
   },
   prompts: {
-    usage: "用法: node recognize.ts <img1> <img2> [token] [locale]",
+    usage: "用法: npx tsx recognize.ts <img1> <img2> [token] [locale]",
     missingFiles: "請提供兩個圖片檔案",
   },
 };

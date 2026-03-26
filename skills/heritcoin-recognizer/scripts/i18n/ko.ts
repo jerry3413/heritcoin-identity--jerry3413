@@ -36,7 +36,7 @@ export const ko: LocaleContent = {
     collectionAdviceDefault: "먼저 보존 상태를 지키고, 장기 소장 여부는 품종과 민트마크를 함께 확인한 뒤 결정하세요.",
   },
   prompts: {
-    usage: "用法: node recognize.ts <img1> <img2> [token] [locale]",
+    usage: "用法: npx tsx recognize.ts <img1> <img2> [token] [locale]",
     missingFiles: "두 개의 이미지 파일을 제공해 주세요",
   },
 };

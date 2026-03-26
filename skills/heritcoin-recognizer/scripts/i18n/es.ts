@@ -36,7 +36,7 @@ export const es: LocaleContent = {
     collectionAdviceDefault: "Prioriza preservar primero el estado de la moneda y luego revisa la variante y la marca de ceca antes de decidir una colección a largo plazo.",
   },
   prompts: {
-    usage: "Uso: node recognize.ts <img1> <img2> [token] [locale]",
+    usage: "Uso: npx tsx recognize.ts <img1> <img2> [token] [locale]",
     missingFiles: "Por favor proporcione ambos archivos de imagen",
   },
 };

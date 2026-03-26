@@ -36,7 +36,7 @@ export const ja: LocaleContent = {
     collectionAdviceDefault: "まず品相の保護を優先し、長期保有を決める前に版別やミントマークを確認してください。",
   },
   prompts: {
-    usage: "使用方法: node recognize.ts <img1> <img2> [token] [locale]",
+    usage: "使用方法: npx tsx recognize.ts <img1> <img2> [token] [locale]",
     missingFiles: "両方の画像ファイルを提供してください",
   },
 };

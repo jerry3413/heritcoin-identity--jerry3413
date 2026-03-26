@@ -627,12 +627,12 @@ async function recognizeCoin(
   if (isUrl) {
     body = JSON.stringify({ img1, img2 });
   } else {
-    console.log(t.messages.uploading);
+    console.error(t.messages.uploading);
     const [url1, url2] = await Promise.all([
       prepareImageReference(img1, token, locale),
       prepareImageReference(img2, token, locale),
     ]);
-    console.log(t.messages.uploadComplete);
+    console.error(t.messages.uploadComplete);
     body = JSON.stringify({ img1: url1, img2: url2 });
   }
 

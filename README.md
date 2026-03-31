@@ -9,7 +9,7 @@ AI-powered coin and antique identification skills.
 - 🪙 **硬币识别** - 识别古钱币、纪念币、机制币，获取详细的鉴定信息
 - 💰 **实时估价** - 提供硬币的市场估值参考
 - 🔍 **多语言支持** - 支持中文、英文、日语、韩语、俄语、西班牙语等多语言识别
-- 📱 **便捷交互** - 支持图片 URL、本地文件路径和 data URL 输入
+- 📱 **便捷交互** - 支持聊天附件、图片 URL、本地文件路径和 data URL 输入
 
 ## 快速开始
 
@@ -44,6 +44,8 @@ npx skills add heritcoin/heritcoin-identity --skill heritcoin-recognizer
 
 **使用方式**:
 
+可以直接提供同一枚钱币的两张图片输入，附件、图片 URL、本地路径和 data URL 都可以；如果当前只发 1 张图，skill 会提示继续补同一枚钱币的另一张图。
+
 ```bash
 # 方式一：提供图片 URL
 /heritcoin-recognizer https://example.com/coin-obverse.jpg https://example.com/coin-reverse.jpg
@@ -51,8 +53,9 @@ npx skills add heritcoin/heritcoin-identity --skill heritcoin-recognizer
 # 方式二：提供本地图片路径
 /heritcoin-recognizer /path/to/obverse.jpg /path/to/reverse.jpg
 
-# 方式三：调用脚本
-npx tsx skills/heritcoin-recognizer/scripts/recognize.ts <img1> <img2> --locale zh-CN
+# 方式三：显式调用脚本
+npx tsx skills/heritcoin-recognizer/scripts/recognize.ts <img...> --session current-thread --locale zh-CN
+
 ```
 
 **识别结果示例**:
@@ -62,10 +65,10 @@ npx tsx skills/heritcoin-recognizer/scripts/recognize.ts <img1> <img2> --locale 
 
 | 项目 | 详情 |
 | --- | --- |
-| 名称 | Poland 50 groszy 1987-MW |
+| 币名 | Poland 50 groszy 1987-MW |
 | 估价 | $3.50 USD |
 | 年份 | 1987 |
-| 国家/地区 | Poland |
+| 国家或地区 | Poland |
 | 面值 | 50 groszy |
 | 铸造量 | 22,000,000 |
 | Krause编号 | KM#95 |
@@ -73,8 +76,8 @@ npx tsx skills/heritcoin-recognizer/scripts/recognize.ts <img1> <img2> --locale 
 | 直径 | 17.5 mm |
 | 厚度 | 1.2 mm |
 | 重量 | 2.4 g |
-| 正面 | Eagle with crown, Poland inscription |
-| 背面 | 50 value, wheat ears |
+| 正面描述 | Eagle with crown, Poland inscription |
+| 背面描述 | 50 value, wheat ears |
 
 收藏建议: 建议先保持原始状态。
 ```

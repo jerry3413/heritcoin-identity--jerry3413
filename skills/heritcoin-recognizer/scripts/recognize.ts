@@ -1,7 +1,7 @@
 import {
-  readFileSync,
   existsSync,
   mkdirSync,
+  readFileSync,
   writeFileSync,
 } from "fs";
 import { join, dirname } from "path";
@@ -27,6 +27,7 @@ const DEFAULT_TOKEN =
 
 const CACHE_DIR = join(__dirname, ".cache");
 const UUID_CACHE_FILE = join(CACHE_DIR, "device.uuid");
+const PENDING_IMAGE_STATE_FILE = join(CACHE_DIR, "pending-images.json");
 
 function generateUUID(): string {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
@@ -63,6 +64,46 @@ function getCachedUUID(): string {
   return cachedUUID;
 }
 
+interface PendingImageState {
+  [sessionId: string]: string | undefined;
+}
+
+function ensureCacheDir(): void {
+  if (!existsSync(CACHE_DIR)) {
+    mkdirSync(CACHE_DIR, { recursive: true });
+  }
+}
+
+function readPendingImageState(): PendingImageState {
+  try {
+    if (!existsSync(PENDING_IMAGE_STATE_FILE)) {
+      return {};
+    }
+    const raw = readFileSync(PENDING_IMAGE_STATE_FILE, "utf-8").trim();
+    if (!raw) {
+      return {};
+    }
+    const parsed = JSON.parse(raw) as PendingImageState;
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function writePendingImageState(state: PendingImageState): void {
+  ensureCacheDir();
+  writeFileSync(
+    PENDING_IMAGE_STATE_FILE,
+    JSON.stringify(state, null, 2),
+    "utf-8",
+  );
+}
+
+function resolveSessionId(sessionId?: string): string {
+  const normalized = sessionId?.trim();
+  return normalized && normalized.length > 0 ? normalized : "default";
+}
+
 export function resolveRuntimeLocale(
   locale?: SupportedLocale | string,
 ): SupportedLocale {
@@ -83,10 +124,10 @@ interface DeviceInfo {
 }
 
 interface CliArgs {
-  img1: string;
-  img2: string;
+  images: string[];
   userToken?: string;
   locale?: SupportedLocale;
+  sessionId?: string;
 }
 
 interface CoinInfo {
@@ -667,14 +708,64 @@ export async function main(
   }
 }
 
-function parseCliArgs(args: string[]): CliArgs {
-  if (args.length < 2) {
-    throw new Error("缺少图片参数");
+async function handleRecognitionRequest(
+  images: string[],
+  userToken?: string,
+  locale?: SupportedLocale,
+  sessionId?: string,
+): Promise<string> {
+  const runtimeLocale = resolveRuntimeLocale(locale);
+  const t = getLocale(runtimeLocale);
+  const currentImages = images.map((image) => image.trim()).filter(Boolean);
+
+  if (currentImages.length === 0) {
+    throw new Error(t.prompts.missingFiles);
   }
 
-  const [img1, img2, ...options] = args;
+  const resolvedSessionId = resolveSessionId(sessionId);
+  const pendingState = readPendingImageState();
+  const pendingImage = pendingState[resolvedSessionId];
+
+  if (currentImages.length > 2) {
+    return pendingImage
+      ? t.messages.tooManyImagesKeepingPending
+      : t.messages.tooManyImages;
+  }
+
+  if (currentImages.length === 2) {
+    if (pendingImage) {
+      delete pendingState[resolvedSessionId];
+      writePendingImageState(pendingState);
+    }
+    return main(currentImages[0], currentImages[1], userToken, runtimeLocale);
+  }
+
+  if (!pendingImage) {
+    pendingState[resolvedSessionId] = currentImages[0];
+    writePendingImageState(pendingState);
+    return t.messages.needAnotherImage;
+  }
+
+  delete pendingState[resolvedSessionId];
+  writePendingImageState(pendingState);
+  return main(pendingImage, currentImages[0], userToken, runtimeLocale);
+}
+
+function parseCliArgs(args: string[]): CliArgs {
+  const images: string[] = [];
+  const options: string[] = [];
+
+  for (const arg of args) {
+    if (arg.startsWith("--") || options.length > 0) {
+      options.push(arg);
+      continue;
+    }
+    images.push(arg);
+  }
+
   let userToken: string | undefined;
   let locale: SupportedLocale | undefined;
+  let sessionId: string | undefined;
 
   for (let index = 0; index < options.length; index += 1) {
     const option = options[index];
@@ -703,18 +794,32 @@ function parseCliArgs(args: string[]): CliArgs {
       continue;
     }
 
+    if (option === "--session") {
+      const value = options[index + 1];
+      if (!value) {
+        throw new Error("缺少 --session 的值");
+      }
+      sessionId = value;
+      index += 1;
+      continue;
+    }
+
     throw new Error(`未知参数: ${option}`);
   }
 
-  return { img1, img2, userToken, locale };
+  if (images.length === 0) {
+    throw new Error("缺少图片参数");
+  }
+
+  return { images, userToken, locale, sessionId };
 }
 
 const args = process.argv.slice(2);
 const isMainModule = process.argv[1]?.endsWith("recognize.ts");
 if (isMainModule) {
   try {
-    const { img1, img2, userToken, locale } = parseCliArgs(args);
-    main(img1, img2, userToken, locale).then((result) => {
+    const { images, userToken, locale, sessionId } = parseCliArgs(args);
+    handleRecognitionRequest(images, userToken, locale, sessionId).then((result) => {
       console.log(result);
     });
   } catch (error) {
